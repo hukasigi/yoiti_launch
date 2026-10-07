@@ -49,12 +49,11 @@ unsigned long prev_ms    = 0;
 
 bool load_finished = false;
 
-const uint8_t DAC_PIN = PA4;
-
 const uint16_t DAC_MAX_VALUE      = 4095;
-const double   SENSOR_VDD         = 3.3;
-const double   NO_CURRENT_OUTPUT  = 1.65;
-const double   SENSOR_MAX_CURRENT = 12.9;
+const double   DAC_REFERENCE_VOLT = 3.3;
+const double   SENSOR_ZERO_VOLT   = 1.65;
+const double   SENSOR_MAX_VOLT    = 3.2;
+const double   SENSOR_MAX_CURRENT = 32.2;
 
 DAC_HandleTypeDef hdac1;
 
@@ -82,16 +81,20 @@ static void dac1_init() {
 }
 
 static uint16_t voltage_to_dac_value(double voltage) {
-    voltage = constrain(voltage, 0.0, SENSOR_VDD);
-    return static_cast<uint16_t>((voltage / SENSOR_VDD) * DAC_MAX_VALUE);
+    voltage = constrain(voltage, 0.0, DAC_REFERENCE_VOLT);
+
+    return static_cast<uint16_t>((voltage / DAC_REFERENCE_VOLT) * DAC_MAX_VALUE);
 }
 
 static double current_to_voltage(double current) {
-    return (((SENSOR_VDD - 0.1) - NO_CURRENT_OUTPUT) / SENSOR_MAX_CURRENT) * current + NO_CURRENT_OUTPUT;
+    current = constrain(current, 0.0, SENSOR_MAX_CURRENT);
+
+    return SENSOR_ZERO_VOLT + (current / SENSOR_MAX_CURRENT) * (SENSOR_MAX_VOLT - SENSOR_ZERO_VOLT);
 }
 
 static void set_current_limit(double current) {
-    const uint16_t value = voltage_to_dac_value(current_to_voltage(current));
+    const double   voltage = current_to_voltage(current);
+    const uint16_t value   = voltage_to_dac_value(voltage);
 
     HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, value);
 }
