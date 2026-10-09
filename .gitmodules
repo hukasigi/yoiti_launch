@@ -4,3 +4,6 @@
 [submodule "lib/Pid"]
 	path = lib/Pid
 	url = git@github.com:hukasigi/PID_library.git
+[submodule "lib/utility"]
+	path = lib/utility
+	url = git@github.com:NiiRoboKen/robocon_2026_utility.git
