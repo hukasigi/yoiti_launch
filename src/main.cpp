@@ -21,7 +21,6 @@ const uint8_t LOAD_DIR_PIN = PA1;
 
 const uint8_t LIM_SW = PB4;
 
-// TODO:1回転あたりのカウント数 変更
 const int32_t ENC_CPR = 8192;
 
 const uint8_t DAC_PIN = PA4;
