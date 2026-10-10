@@ -31,7 +31,7 @@ double target_rpm = -4000.0;
 
 HardwareTimer encoderTimer(TIM3);
 
-const uint8_t  PWM_LIMIT      = 100;
+const uint8_t  PWM_LIMIT      = 255;
 const uint16_t INTEGRAL_LIMIT = 1000;
 
 // PID定数（要調整）
