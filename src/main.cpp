@@ -22,7 +22,7 @@ const uint8_t LOAD_DIR_PIN = PA1;
 const uint8_t LIM_SW = PB4;
 
 // TODO:1回転あたりのカウント数 変更
-const int32_t ENC_CPR = 4096;
+const int32_t ENC_CPR = 8192;
 
 const uint8_t DAC_PIN = PA4;
 
@@ -31,7 +31,7 @@ double target_rpm = -4000.0;
 
 HardwareTimer encoderTimer(TIM3);
 
-const uint8_t  PWM_LIMIT      = 255;
+const uint8_t  PWM_LIMIT      = 100;
 const uint16_t INTEGRAL_LIMIT = 1000;
 
 // PID定数（要調整）
@@ -208,7 +208,7 @@ static void can_receive_command() {
             break;
 
         case CAN_CMD_STOP_ROLLER:
-            launch_started = false;
+            roller_started = false;
             Serial.println("Launch stop");
             break;
 
@@ -271,7 +271,7 @@ void loop() {
 
     bool target_reached = false;
 
-    if (launch_started) {
+    if (roller_started) {
         const double control = pid.update(target_rpm, measured_rpm, dt);
         launch.run(static_cast<int>(control));
 
@@ -297,16 +297,16 @@ void loop() {
         }
     }
 
-    // if (target_reached && now_ms - last_can_sent >= 200) {
-    if (now_ms - last_can_sent >= 200) {
+    if (target_reached && now_ms - last_can_sent >= 200) {
+        // if (now_ms - last_can_sent >= 200) {
         can_send_target_reached();
         last_can_sent = now_ms;
     }
 
-    if (millis() - last_printed >= 200) {
-        Serial.print(digitalRead(LIM_SW));
-        Serial.print("rpm: ");
-        Serial.println(measured_rpm);
-        last_printed = millis();
-    }
+    // if (millis() - last_printed >= 200) {
+    //     Serial.print(digitalRead(LIM_SW));
+    //     Serial.print("rpm: ");
+    //     Serial.println(measured_rpm);
+    //     last_printed = millis();
+    // }
 }
